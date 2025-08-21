@@ -74,8 +74,3 @@ python manage.py makemigrations
 python manage.py migrate
 ### 5️⃣ Run Development Server
 python manage.py runserver
-
-## 📊 Roles & Dashboards
-Student Dashboard: Apply & track leaves, view balances.
-Faculty Dashboard: Approve/Reject leave requests, track departmental stats.
-Admin Dashboard: View analytics, manage system-wide stats & users.
