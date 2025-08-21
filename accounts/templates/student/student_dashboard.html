@@ -1,0 +1,141 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+<!-- Navbar -->
+<nav class="bg-white border-b shadow-sm px-6 py-4 flex justify-between items-center">
+  <!-- Logo and Title -->
+  <div class="flex items-center space-x-2">
+    <img src="https://img.icons8.com/fluency/48/leave.png" class="h-6 w-6" />
+    <h1 class="text-xl font-bold text-indigo-600">LeaveEase</h1>
+  </div>
+
+  <!-- Right Section -->
+  <div class="flex items-center space-x-4">
+    {% if user.role == "student" %}
+      <a href="{% url 'apply_leave' %}" class="bg-indigo-600 text-white text-sm px-4 py-1.5 rounded hover:bg-indigo-700">
+        Apply Leave
+      </a>
+    {% endif %}
+
+    <!-- User Info (hidden on small screens) -->
+    <div class="text-right hidden sm:block">
+      <p class="font-semibold">{{ user.get_full_name }}</p>
+      <p class="text-xs text-gray-500">{{ user.role }} - {{ user.department }}</p>
+    </div>
+
+    <!-- Initials Circle -->
+    <div class="bg-gray-200 text-sm rounded-full w-8 h-8 flex items-center justify-center font-semibold">
+      {{ user.get_initials }}
+    </div>
+
+    <!-- Logout -->
+    <a href="{% url 'logout' %}" class="bg-white border px-3 py-1 rounded hover:bg-gray-100 text-sm">Logout</a>
+
+  </div>
+
+</nav>
+
+
+    <!-- Summary Cards -->
+<div class="max-w-6xl mx-auto p-6">
+
+    <h2 class="text-2xl font-bold mb-1">Student Dashboard</h2>
+    <p class="text-sm text-gray-500 mb-6">{{ user.get_full_name }} - {{ user.department }}</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-2xl shadow p-4">
+        <p class="text-sm text-gray-500">Total Leave Requests</p>
+        <p class="text-2xl font-semibold">{{ total_requests }}</p>
+      </div>
+      <div class="bg-yellow-100 rounded-2xl shadow p-4">
+        <p class="text-sm text-gray-600">Pending Requests</p>
+        <p class="text-2xl font-semibold">{{ pending_requests }}</p>
+      </div>
+      <div class="bg-green-100 rounded-2xl shadow p-4">
+        <p class="text-sm text-gray-600">Approved Requests</p>
+        <p class="text-2xl font-semibold">{{ approved_requests }}</p>
+      </div>
+      <div class="bg-red-100 rounded-2xl shadow p-4">
+        <p class="text-sm text-gray-600">Rejected Requests</p>
+        <p class="text-2xl font-semibold">{{ rejected_requests }}</p>
+      </div>
+    </div>
+
+    <!-- Leave Balance Section -->
+    <div class="bg-white rounded-2xl shadow p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">Leave Balances</h2>
+      <div class="space-y-4">
+        {% for type, used, remaining in leave_data %}
+          {% with total=used|add:remaining %}
+            <div>
+              <p class="text-sm font-medium text-gray-700">{{ type }} Leave</p>
+              <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-blue-500 h-4 rounded-full" style="width: {{ used|get_percent:total }}%"></div>
+              </div>
+              <p class="text-sm text-gray-600 mt-1">{{ used }} used / {{ remaining }} remaining</p>
+            </div>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+</div>
+
+    <!-- Recent Leave Requests Table -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-xl font-semibold mb-4">Recent Leave Requests</h2>
+      <table class="min-w-full table-auto text-sm">
+        <thead>
+          <tr class="text-left text-gray-700 border-b">
+            <th class="py-2">Leave Type</th>
+            <th class="py-2">Duration</th>
+            <th class="py-2">Submitted At</th>
+            <th class="py-2">Reason</th>
+            <th class="py-2">Status</th>
+            <th class="py-2">Document</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-800">
+          {% for leave in recent_leaves %}
+            <tr class="border-t">
+              <td class="py-2">{{ leave.leave_type }}</td>
+              <td class="py-2">{{ leave.start_date }} to {{ leave.end_date }}</td>
+              <td class="py-2">{{ leave.submitted_at|date:"Y-m-d H:i" }}</td>
+              <td class="py-2">{{ leave.reason|truncatechars:50 }}</td>
+              <td class="py-2">
+                {% if leave.status == 'Pending' %}
+                  <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full text-xs">Pending</span>
+                {% elif leave.status == 'Approved' %}
+                  <span class="bg-green-200 text-green-800 px-2 py-1 rounded-full text-xs">Approved</span>
+                {% else %}
+                  <span class="bg-red-200 text-red-800 px-2 py-1 rounded-full text-xs">Rejected</span>
+                {% endif %}
+              </td>
+              <td class="py-2">
+                {% if leave.document %}
+                  <a href="{{ leave.document.url }}" target="_blank" class="text-blue-600 hover:underline">View</a>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="py-4 text-center text-gray-500">No leave requests yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

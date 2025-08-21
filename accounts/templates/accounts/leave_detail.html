@@ -1,0 +1,49 @@
+
+{% block content %}
+<body class="bg-blue-50 min-h-screen">
+  <div class="flex items-center justify-center min-h-screen px-4">
+    <div class="bg-white max-w-2xl w-full p-6 rounded-lg shadow-lg">
+
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">📄 Leave Request Detail</h2>
+
+      <div class="space-y-3 text-gray-700 text-sm">
+        <p><strong>👤 Student:</strong> {{ leave.user.get_full_name }}</p>
+        <p><strong>🎓 Roll No:</strong> {{ leave.user.roll_number }}</p>
+        <p><strong>📌 Type:</strong> {{ leave.leave_type }}</p>
+        <p><strong>📅 From:</strong> {{ leave.start_date }}</p>
+        <p><strong>📅 To:</strong> {{ leave.end_date }}</p>
+        <p><strong>⏱️ Duration:</strong> {{ leave.duration }} days</p>
+        <p><strong>📝 Reason:</strong> {{ leave.reason }}</p>
+        <p><strong>🏠 Address During Leave:</strong> {{ leave.address_during_leave }}</p>
+        <p><strong>📞 Emergency Contact:</strong> {{ leave.emergency_contact }}</p>
+        <p><strong>📤 Submitted At:</strong> {{ leave.submitted_at }}</p>
+        <p><strong>📊 Status:</strong>
+          <span class="inline-block px-2 py-1 rounded text-white text-xs
+            {% if leave.status == 'Approved' %}
+              bg-green-600
+            {% elif leave.status == 'Rejected' %}
+              bg-red-600
+            {% else %}
+              bg-yellow-500
+            {% endif %}
+          ">
+            {{ leave.status }}
+          </span>
+        </p>
+
+        {% if leave.document %}
+        <p><strong>📎 Document:</strong>
+          <a href="{{ leave.document.url }}" target="_blank" class="text-indigo-600 underline">
+            {{ leave.document.name|slice:"-20:" }}
+          </a>
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="mt-6">
+        <a href="{% url 'faculty_dashboard' %}" class="inline-block px-4 py-2 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">← Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+{% endblock %}

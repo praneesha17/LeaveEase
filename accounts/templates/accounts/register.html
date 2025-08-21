@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register – LeaveEase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-b from-blue-100 to-blue-200 min-h-screen flex items-center justify-center">
+
+  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+    <!-- Logo & Heading -->
+    <div class="flex flex-col items-center mb-6">
+      <div class="bg-blue-500 text-white w-12 h-12 flex items-center justify-center rounded-full text-xl">📅</div>
+      <h2 class="mt-2 text-xl font-bold text-gray-800">Join LeaveEase</h2>
+      <p class="text-sm text-gray-500">Create your account to get started</p>
+    </div>
+
+    <!-- Flash Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="mb-4 p-3 rounded text-sm font-medium
+          {% if message.tags == 'success' %}
+            bg-green-100 border border-green-300 text-green-700
+          {% elif message.tags == 'error' %}
+            bg-red-100 border border-red-300 text-red-700
+          {% else %}
+            bg-gray-100 border border-gray-300 text-gray-700
+          {% endif %}
+        ">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form Errors -->
+    {% if form.errors %}
+      <div class="bg-red-100 text-red-700 p-2 mb-4 rounded border border-red-300 text-sm">
+        <ul class="list-disc pl-4">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <!-- Register Form -->
+    <form method="POST" action="{% url 'register' %}" class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+  <label class="block text-sm font-medium text-gray-700">First Name</label>
+  <input type="text" name="first_name" placeholder="John" required
+    class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+</div>
+
+<div>
+  <label class="block text-sm font-medium text-gray-700">Last Name</label>
+  <input type="text" name="last_name" placeholder="Doe" required
+    class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+</div>
+
+<div>
+  <label class="block text-sm font-medium text-gray-700">Username</label>
+  <input type="text" name="username" placeholder="Your unique username" required
+    class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+</div>
+
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Email Address</label>
+        <input type="email" name="email" placeholder="your.email@college.edu" required
+          class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+        <input type="text" name="phone_number" placeholder="+1-234-567-8900" required
+          class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" name="password1" placeholder="Create password" required
+          class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
+        <input type="password" name="password2" placeholder="Confirm password" required
+          class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Role</label>
+        <select name="role" class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="student">Student</option>
+          <option value="faculty">Faculty</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Department</label>
+        <input type="text" name="department" placeholder="CSE / ECE / IT" required
+          class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Roll Number</label>
+        <input type="text" name="roll_number" placeholder="e.g., CS2021001"
+          class="mt-1 w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+      </div>
+
+      <button type="submit"
+        class="w-full py-2 mt-4 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition duration-300">
+        Create Account
+      </button>
+    </form>
+
+    <p class="mt-4 text-sm text-center text-gray-600">
+      Already have an account?
+      <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Sign in here</a>
+    </p>
+  </div>
+</body>
+</html>

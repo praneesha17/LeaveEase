@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | LeaveEase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <img src="https://img.icons8.com/fluency/48/leave.png" class="h-6 w-6" />
+      <h1 class="text-xl font-bold text-indigo-600">LeaveEase</h1>
+    </div>
+    <div class="flex items-center space-x-4">
+      <span class="text-gray-700 hidden sm:inline">{{ user.get_full_name }}</span>
+      <span class="text-sm px-2 py-1 rounded text-white bg-gray-600">{{ user.role|title }}</span>
+      <a href="{% url 'logout' %}" class="bg-white border px-3 py-1 rounded hover:bg-gray-100 text-sm">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <div class="max-w-7xl mx-auto px-6 py-6">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-1">Admin Dashboard</h2>
+    <p class="text-sm text-gray-500 mb-6">Welcome, {{ user.get_full_name }}. Here's your system overview.</p>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <p class="text-sm text-gray-600">👥 Total Users</p>
+        <p class="text-2xl font-bold text-gray-800">{{ total_users }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <p class="text-sm text-gray-600">📄 Total Requests</p>
+        <p class="text-2xl font-bold text-gray-800">{{ total_requests }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <p class="text-sm text-gray-600">⏳ Pending</p>
+        <p class="text-2xl font-bold text-yellow-600">{{ pending_requests }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <p class="text-sm text-gray-600">📊 Approval Rate</p>
+        <p class="text-2xl font-bold text-green-600">{{ approval_rate }}%</p>
+      </div>
+
+      <div class="flex justify-end items-center gap-2 col-span-2 lg:col-span-1">
+        <a href="?tab=settings" class="px-3 py-2 border rounded text-sm hover:bg-gray-100">⚙ Settings</a>
+        <button class="px-3 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">⬇ Export</button>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="mb-6 flex space-x-4 text-sm">
+      <a href="?tab=analytics" class="px-4 py-2 rounded-full border transition-all duration-200 {% if tab == 'analytics' %}bg-indigo-100 text-indigo-700 border-indigo-400{% else %}bg-white text-gray-600 border-gray-300 hover:bg-indigo-50{% endif %}">Analytics</a>
+      <a href="?tab=departments" class="px-4 py-2 rounded-full border transition-all duration-200 {% if tab == 'departments' %}bg-indigo-100 text-indigo-700 border-indigo-400{% else %}bg-white text-gray-600 border-gray-300 hover:bg-indigo-50{% endif %}">Departments</a>
+      <a href="?tab=requests" class="px-4 py-2 rounded-full border transition-all duration-200 {% if tab == 'requests' %}bg-indigo-100 text-indigo-700 border-indigo-400{% else %}bg-white text-gray-600 border-gray-300 hover:bg-indigo-50{% endif %}">All Requests</a>
+      <a href="?tab=settings" class="px-4 py-2 rounded-full border transition-all duration-200 {% if tab == 'settings' %}bg-indigo-100 text-indigo-700 border-indigo-400{% else %}bg-white text-gray-600 border-gray-300 hover:bg-indigo-50{% endif %}">System Settings</a>
+    </div>
+    {% if tab == 'analytics' %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <!-- Monthly Leave Trends -->
+        <div class="bg-white rounded-xl p-4 shadow">
+            <h2 class="text-lg font-semibold mb-2">📅 Monthly Leave Trends</h2>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+
+        <!-- Leave Distribution -->
+        <div class="bg-white rounded-xl p-4 shadow">
+            <h2 class="text-lg font-semibold mb-2">📊 Leave Distribution</h2>
+            <canvas id="leaveChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+      const monthLabels = {{ months|safe }};
+      const monthData = {{ monthly_counts|safe }};
+      const leaveLabels = {{ leave_labels|safe }};
+      const leaveCounts = {{ leave_counts|safe }};
+
+      // Monthly Trends Line Chart
+      new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: {
+          labels: monthLabels,
+          datasets: [{
+            label: 'Leave Requests',
+            data: monthData,
+            borderWidth: 2,
+            borderColor: 'rgba(99, 102, 241, 1)',
+            backgroundColor: 'rgba(99, 102, 241, 0.2)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      // Leave Distribution Doughnut Chart
+      new Chart(document.getElementById('leaveChart'), {
+        type: 'doughnut',
+        data: {
+          labels: leaveLabels,
+          datasets: [{
+            label: 'Leave Types',
+            data: leaveCounts,
+            backgroundColor: [
+              'rgba(99, 102, 241, 0.7)',
+              'rgba(16, 185, 129, 0.7)',
+              'rgba(244, 114, 182, 0.7)',
+              'rgba(251, 191, 36, 0.7)'
+            ],
+            borderWidth: 1
+          }]
+        }
+      });
+    </script>
+    {% endif %}
+
+
+    <!-- Departments Tab -->
+    {% if tab == 'departments' %}
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">🏢 Department-wise Leave Stats</h3>
+      <table class="w-full table-auto border text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="border px-4 py-2 text-left">Department</th>
+            <th class="border px-4 py-2 text-left">Total</th>
+            <th class="border px-4 py-2 text-left text-green-600">Approved</th>
+            <th class="border px-4 py-2 text-left text-red-500">Rejected</th>
+            <th class="border px-4 py-2 text-left text-yellow-500">Pending</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dept in department_stats %}
+          <tr class="hover:bg-gray-50">
+            <td class="border px-4 py-2">{{ dept.name }}</td>
+            <td class="border px-4 py-2">{{ dept.total }}</td>
+            <td class="border px-4 py-2">{{ dept.approved }}</td>
+            <td class="border px-4 py-2">{{ dept.rejected }}</td>
+            <td class="border px-4 py-2">{{ dept.pending }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <!-- Requests Tab -->
+    {% if tab == 'requests' %}
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <span class="mr-2">📝</span> All Leave Requests
+      </h2>
+      {% if leave_requests %}
+      <div class="space-y-4">
+        {% for request in leave_requests %}
+        <div class="border p-4 rounded-md shadow-sm">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-medium">Request #{{ forloop.counter }}</h3>
+            <span class="px-2 py-1 text-sm rounded
+              {% if request.status == 'Pending' %}
+                bg-yellow-100 text-yellow-800
+              {% elif request.status == 'Approved' %}
+                bg-green-100 text-green-800
+              {% elif request.status == 'Rejected' %}
+                bg-red-100 text-red-800
+              {% endif %}">
+              {{ request.status }}
+            </span>
+          </div>
+          <p><strong>User:</strong> {{ request.user.get_full_name }} (ID: {{ request.user.id }})</p>
+          <p><strong>Type:</strong> {{ request.leave_type }}</p>
+          <p><strong>Duration:</strong> {{ request.start_date }} to {{ request.end_date }}</p>
+          <p><strong>Submitted:</strong> {{ request.submitted_at|date:"M d, Y" }}</p>
+          <p><strong>Reason:</strong> {{ request.reason }}</p>
+          {% if request.approved_by %}
+          <p><strong>Approved By:</strong> {{ request.approved_by.get_full_name }}</p>
+          {% endif %}
+          {% if request.comments %}
+          <p><strong>Comments:</strong> {{ request.comments }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-500">No leave requests found.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Settings Tab -->
+    {% if tab == 'settings' %}
+<div class="bg-white rounded-2xl shadow p-6">
+  <h3 class="text-lg font-semibold text-gray-700 mb-4">⚙ System Settings</h3>
+  <div class="space-y-4">
+    {% for name, days in policies.items %}
+    <div class="p-4 border rounded flex justify-between items-center">
+      <div>
+        <h4 class="font-medium">{{ name }}</h4>
+        <p class="text-sm text-gray-500">{{ days }} days per year</p>
+      </div>
+      <button class="text-sm px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200">Edit</button>
+    </div>
+    {% endfor %}
+    <button class="w-full mt-4 py-2 text-white bg-black rounded hover:opacity-90">+ Add New Policy</button>
+  </div>
+</div>
+{% endif %}
+
+  </div>
+</body>
+</html>

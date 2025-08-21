@@ -1,0 +1,90 @@
+{% if tab == 'departments' %}
+<!-- Section 1: Department-wise Statistics -->
+<div class="p-6">
+    <h2 class="text-xl font-bold mb-4">Department-wise Statistics</h2>
+
+    {% for dept in departments %}
+    <div class="bg-white p-4 rounded shadow mb-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold">{{ dept.name }}</h3>
+            <span class="text-sm text-gray-500">{{ dept.total }} total requests</span>
+        </div>
+        <div class="flex items-center space-x-6 mt-2">
+            <div class="text-yellow-500 font-semibold">{{ dept.pending }}<br><span class="text-sm text-gray-600">Pending</span></div>
+            <div class="text-green-600 font-semibold">{{ dept.approved }}<br><span class="text-sm text-gray-600">Approved</span></div>
+            <div class="text-red-600 font-semibold">{{ dept.rejected }}<br><span class="text-sm text-gray-600">Rejected</span></div>
+        </div>
+        <div class="mt-2 text-sm text-gray-600">Approval Rate</div>
+        <div class="w-full bg-gray-200 h-2 rounded-full">
+            <div class="bg-black h-2 rounded-full" style="width: {{ dept.approval_rate }}%"></div>
+        </div>
+        <div class="text-sm text-gray-700 mt-1">{{ dept.approval_rate }}%</div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Section 2: Manage Departments -->
+<div class="bg-white p-6 rounded-lg shadow mt-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Manage Departments</h2>
+    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm">+ Add Department</a>
+  </div>
+
+  <table class="min-w-full table-auto text-sm">
+    <thead class="bg-gray-100 text-gray-700">
+      <tr>
+        <th class="px-4 py-2 text-left">#</th>
+        <th class="px-4 py-2 text-left">Department Name</th>
+        <th class="px-4 py-2 text-left">Users</th>
+        <th class="px-4 py-2 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for dept in departments %}
+      <tr class="border-b">
+        <td class="px-4 py-2">{{ forloop.counter }}</td>
+        <td class="px-4 py-2 font-medium">{{ dept.name }}</td>
+        <td class="px-4 py-2">{{ dept.user_count }}</td>
+        <td class="px-4 py-2 space-x-2">
+          <a href="#" class="text-blue-600 hover:underline">Edit</a>
+          <a href="#" class="text-red-500 hover:underline">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="px-4 py-2 text-center text-gray-500">No departments found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="overflow-x-auto mt-4">
+  <table class="min-w-full table-auto text-sm bg-white rounded shadow">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-4 py-2 text-left">Department</th>
+        <th class="px-4 py-2 text-center">Total</th>
+        <th class="px-4 py-2 text-center text-green-600">Approved</th>
+        <th class="px-4 py-2 text-center text-red-500">Rejected</th>
+        <th class="px-4 py-2 text-center text-yellow-500">Pending</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for dept in departments %}
+      <tr class="border-t">
+        <td class="px-4 py-2 font-medium">{{ dept.name }}</td>
+        <td class="px-4 py-2 text-center">{{ dept.total }}</td>
+        <td class="px-4 py-2 text-center">{{ dept.approved }}</td>
+        <td class="px-4 py-2 text-center">{{ dept.rejected }}</td>
+        <td class="px-4 py-2 text-center">{{ dept.pending }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="text-center py-4 text-gray-500">No department data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endif %}
