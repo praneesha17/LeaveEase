@@ -58,6 +58,19 @@ It provides role-based dashboards, real-time leave tracking, and automated balan
 
 ---
 
+## Server Requirements
+- **Python** 3.9+ (3.11 recommended)  
+- **Django** 5.0+  
+- **Database:** SQLite 3.9+ (for development/testing only)  
+- **Package Manager:** pip 23+  
+
+## Client Requirements
+- Modern web browser (Chrome, Firefox, Edge, Safari)  
+- JavaScript enabled  
+- Minimum screen resolution: 1280×720 (responsive design supported)  
+
+---
+
 ## 📦 Project Setup
 
 ### 1️⃣ Clone the Repository
